@@ -1,9 +1,12 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View, TextInput, KeyboardAvoidingView, Button } from 'react-native';
+import { Text, View, TextInput, KeyboardAvoidingView, Button, Pressable } from 'react-native';
 import InlineTextButton from '../components/InlineTextButton';
+import ActionButton from '../components/ActionButton';
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/index";
+import { AntDesign } from '@expo/vector-icons';
+import { globalStyles } from "../styles/global";
 
 export default function Login({navigation}) {
 
@@ -31,25 +34,16 @@ export default function Login({navigation}) {
     }
 
     return (
-        <View style={styles.container}>
+        <View style={globalStyles.container}>
             <Text>{errorMessage}</Text>
-            <TextInput placeholder='Email' value={email} onChangeText={setEmail}></TextInput>
-            <TextInput placeholder='Password' value={password} onChangeText={setPassword}></TextInput>
-            <Text>Don't have an account?<InlineTextButton text="Sign Up" onPress={() => navigation.navigate("SignUp")}/></Text>
-            <Text>Forgot your Password?<InlineTextButton text="Reset" onPress={() => navigation.navigate("ResetPassword")} /></Text>
+            <TextInput placeholder='Email' value={email} onChangeText={setEmail} style={ globalStyles.inlineTextStyle }></TextInput>
+            <TextInput placeholder='Password' value={password} onChangeText={setPassword} style={ globalStyles.inlineTextStyle } ></TextInput>
+            <Text style={globalStyles.bodyText}>Don't have an account?<InlineTextButton text="Sign Up" onPress={() => navigation.navigate("SignUp")}/></Text>
+            <Text style={globalStyles.bodyText}>Forgot your Password?<InlineTextButton text="Reset" onPress={() => navigation.navigate("ResetPassword")} /></Text>
         <StatusBar style="auto" />
-        <Button title="Login" onPress={login} />
+        <ActionButton onPress={login} text="Login"/>
+        {/* <Button title="Login" onPress={login} /> */}
         </View>
   );
 }
 
-
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'yellow',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
