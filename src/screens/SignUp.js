@@ -37,6 +37,7 @@ export default function SignUp({navigation}) {
 
     return (
         <View style={styles.container}>
+          
           <Text>{validationMessage}</Text>
             <TextInput placeholder='Email' value={email} onChangeText={setEmail}></TextInput>
             <TextInput placeholder='Password' value={password} onChangeText={(value) => validateAndSet(value, confirmPassword, setPassword)}></TextInput>
