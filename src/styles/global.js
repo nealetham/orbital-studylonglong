@@ -3,12 +3,15 @@ import { StyleSheet, Text, View, TextInput, KeyboardAvoidingView, Button } from 
 
 
 export const globalStyles = StyleSheet.create({
+    headerText: {
+        marginLeft: 30,
+        marginBottom: 30,
+        fontSize: 24,
+    },
     container: {
         flex: 1,
         paddingTop: 50,
         backgroundColor: '#FFFFFF',
-        // alignItems: 'center',
-        // justifyContent: 'center',
     },
     inlineTextStyle: {
         borderRadius: 15,

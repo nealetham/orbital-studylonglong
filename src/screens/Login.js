@@ -35,6 +35,7 @@ export default function Login({navigation}) {
 
     return (
         <View style={globalStyles.container}>
+            <Text style={globalStyles.headerText}>Login</Text>
             <Text>{errorMessage}</Text>
             <TextInput placeholder='Email' value={email} onChangeText={setEmail} style={ globalStyles.inlineTextStyle }></TextInput>
             <TextInput placeholder='Password' value={password} onChangeText={setPassword} style={ globalStyles.inlineTextStyle } ></TextInput>
