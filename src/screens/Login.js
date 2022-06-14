@@ -1,24 +1,26 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import {
-  Text,
-  View,
-  TextInput,
-  KeyboardAvoidingView,
-  Button,
-  Pressable,
-} from "react-native";
+import { Text, View, TextInput } from "react-native";
 import InlineTextButton from "../components/InlineTextButton";
 import ActionButton from "../components/ActionButton";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+} from "firebase/auth";
 import { auth } from "../firebase/index";
-import { AntDesign } from "@expo/vector-icons";
 import { globalStyles } from "../styles/global";
 
 export default function Login({ navigation }) {
   React.useEffect(() => {
     if (auth.currentUser) {
       navigation.navigate("Dashboard");
+    } else {
+      onAuthStateChanged(auth, (user) => {
+        if (user) {
+          navigation.navigate("Dashboard");
+        }
+      });
     }
   });
 
@@ -55,6 +57,7 @@ export default function Login({ navigation }) {
         value={password}
         onChangeText={setPassword}
         style={globalStyles.textInputContainer}
+        secureTextEntry={true}
       ></TextInput>
       <Text style={globalStyles.bodyText}>
         Don't have an account?{" "}
