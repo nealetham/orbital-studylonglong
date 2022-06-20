@@ -1,7 +1,15 @@
 import React from "react";
 import { Text, View } from "react-native";
+import { auth } from "../firebase/index";
+import { signOut } from "firebase/auth";
 
-export default function Settings() {
+export default function Settings({ navigation }) {
+  let logout = () => {
+    signOut(auth).then(() => {
+      navigation.navigate("Login");
+    });
+  };
+
   return (
     <View
       style={{
@@ -10,7 +18,7 @@ export default function Settings() {
         alignItems: "center",
       }}
     >
-      <Text>Shop</Text>
+      <Text onPress={logout}>Logout</Text>
     </View>
   );
 }

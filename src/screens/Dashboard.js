@@ -22,7 +22,7 @@ export default function Dashboard({ navigation, route }) {
 
   let showContent = () => {
     return (
-      <Drawer.Navigator>
+      <Drawer.Navigator useLegacyImplementation={true}>
         <Drawer.Screen name="Home" component={Home} options={headerOption} />
         <Drawer.Screen
           name="Schedule"

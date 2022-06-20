@@ -6,6 +6,8 @@ import {
   View,
   Text,
   StyleSheet,
+  Pressable,
+  StatusBar,
 } from "react-native";
 import OutIconTextInput from "./OutIconTextInput";
 import ActionButton from "./ActionButton";
@@ -20,44 +22,54 @@ export default function AddTaskModal(props) {
   const [toDoDescription, setToDoDescription] = React.useState("");
 
   const [startDate, setStartDate] = React.useState(new Date());
-  const [endDate, setEndDate] = React.useState(new Date());
+  // const [endDate, setEndDate] = React.useState(new Date());
 
   const [startTime, setStartTime] = React.useState(new Date(Date.now()));
   const [endTime, setEndTime] = React.useState(new Date(Date.now()));
 
   const [showStartDate, setShowStartDate] = React.useState(false);
-  const [showEndDate, setShowEndDate] = React.useState(false);
+  // const [showEndDate, setShowEndDate] = React.useState(false);
 
   const [showStartTime, setShowStartTime] = React.useState(false);
   const [showEndTime, setShowEndTime] = React.useState(false);
 
+  const [color, setColor] = React.useState([
+    "rgba(255, 169, 50, 1)",
+    "#Fff0d4",
+  ]); // border color , background color
+
+  const [creamPressed, setCreamPressed] = React.useState(true);
+  const [greenPressed, setGreenPressed] = React.useState(false);
+  const [tealPressed, setTealPressed] = React.useState(false);
+  const [purplePressed, setPurplePressed] = React.useState(false);
+
   const onChangeStartDate = (event, selectedStartDate) => {
-    setStartDate(selectedStartDate);
     setShowStartDate(false);
+    setStartDate(selectedStartDate);
   };
 
-  const onChangeEndDate = (event, selectedEndDate) => {
-    setEndDate(selectedEndDate);
-    setShowEndDate(false);
-  };
+  // const onChangeEndDate = (event, selectedEndDate) => {
+  //   setShowEndDate(false);
+  //   setEndDate(selectedEndDate);
+  // };
 
   const onChangeStartTime = (event, selectedStartTime) => {
-    setStartTime(selectedStartTime);
     setShowStartTime(false);
+    setStartTime(selectedStartTime);
   };
 
   const onChangeEndTime = (event, selectedEndTime) => {
-    setEndTime(selectedEndTime);
     setShowEndTime(false);
+    setEndTime(selectedEndTime);
   };
 
   const showStartDatePicker = () => {
     setShowStartDate(true);
   };
 
-  const showEndDatePicker = () => {
-    setShowEndDate(true);
-  };
+  // const showEndDatePicker = () => {
+  //   setShowEndDate(true);
+  // };
 
   const showStartTimePicker = () => {
     setShowStartTime(true);
@@ -67,12 +79,26 @@ export default function AddTaskModal(props) {
     setShowEndTime(true);
   };
 
+  const fStartTime =
+    String(startTime.getHours()).padStart(2, "0") +
+    ":" +
+    String(startTime.getMinutes()).padStart(2, "0");
+
+  const fEndTime =
+    String(endTime.getHours()).padStart(2, "0") +
+    ":" +
+    String(endTime.getMinutes()).padStart(2, "0");
   return (
     <BottomSheet
       visible={props.visible}
       onBackButtonPress={props.toggleBottomNavigationView}
       onBackdropPress={props.toggleBottomNavigationView}
     >
+      {/* <StatusBar
+        backgroundColor="#4d4d4d"
+        showHideTransition="none"
+        animated={true}
+      /> */}
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <KeyboardAvoidingView
           style={globalStyles.addTaskBottomSheet}
@@ -99,11 +125,12 @@ export default function AddTaskModal(props) {
             <Text style={styles.dateTimeText} onPress={showStartDatePicker}>
               {startDate.toDateString()}
             </Text>
-            <Text>--</Text>
-            <Text style={styles.dateTimeText} onPress={showEndDatePicker}>
+            {/* <Text>--</Text> */}
+            {/* <Text style={styles.dateTimeText} onPress={showEndDatePicker}>
               {endDate.toDateString()}
-            </Text>
+            </Text> */}
           </View>
+
           {/* TIME CONTAINER */}
           <View style={styles.dateContainer}>
             <Ionicons
@@ -113,12 +140,70 @@ export default function AddTaskModal(props) {
               style={{ paddingTop: 4 }}
             />
             <Text style={styles.dateTimeText} onPress={showStartTimePicker}>
-              {startTime.toLocaleTimeString("en-US")}
+              {fStartTime}
             </Text>
             <Text>--</Text>
             <Text style={styles.dateTimeText} onPress={showEndTimePicker}>
-              {endTime.toLocaleTimeString("en-US")}
+              {fEndTime}
             </Text>
+          </View>
+
+          {/* COLOR PICKER */}
+          <View style={styles.dateContainer}>
+            <Ionicons
+              name="color-palette-outline"
+              size={22}
+              color={"black"}
+              style={{ paddingTop: 4 }}
+            />
+            <View style={{ flexDirection: "row" }}>
+              <Pressable // Cream
+                style={
+                  creamPressed ? styles.creamPressed : styles.creamUnpressed
+                }
+                onPress={() => {
+                  setCreamPressed(true);
+                  setGreenPressed(false);
+                  setTealPressed(false);
+                  setPurplePressed(false);
+                  setColor(["rgba(255, 169, 50, 1)", "#Fff0d4"]);
+                }}
+              />
+              <Pressable // Green
+                style={
+                  greenPressed ? styles.greenPressed : styles.greenUnpressed
+                }
+                onPress={() => {
+                  setGreenPressed(true);
+                  setCreamPressed(false);
+                  setTealPressed(false);
+                  setPurplePressed(false);
+                  setColor(["#3ed64e", "#baffc1"]);
+                }}
+              />
+              <Pressable // Teal
+                style={tealPressed ? styles.tealPressed : styles.tealUnpressed}
+                onPress={() => {
+                  setTealPressed(true);
+                  setCreamPressed(false);
+                  setGreenPressed(false);
+                  setPurplePressed(false);
+                  setColor(["#3981db", "#9cc8ff"]);
+                }}
+              />
+              <Pressable // Purple
+                style={
+                  purplePressed ? styles.purplePressed : styles.purpleUnpressed
+                }
+                onPress={() => {
+                  setPurplePressed(true);
+                  setCreamPressed(false);
+                  setGreenPressed(false);
+                  setTealPressed(false);
+                  setColor(["#c478ff", "#e8c9ff"]);
+                }}
+              />
+            </View>
           </View>
 
           {showStartDate && (
@@ -131,7 +216,7 @@ export default function AddTaskModal(props) {
               onChange={onChangeStartDate}
             />
           )}
-          {showEndDate && (
+          {/* {showEndDate && (
             <DateTimePicker
               testID="dateTimePicker"
               value={endDate}
@@ -140,7 +225,7 @@ export default function AddTaskModal(props) {
               display="default"
               onChange={onChangeEndDate}
             />
-          )}
+          )} */}
           {showStartTime && (
             <DateTimePicker
               testID="dateTimePicker"
@@ -166,7 +251,9 @@ export default function AddTaskModal(props) {
             text="Cancel"
             onPress={() => {
               setStartDate(new Date());
-              setEndDate(new Date());
+              // setEndDate(new Date());
+              setStartTime(new Date(Date.now()));
+              setEndTime(new Date(Date.now()));
               props.toggleBottomNavigationView();
             }}
           />
@@ -177,15 +264,20 @@ export default function AddTaskModal(props) {
               props.onPress(
                 toDoTitle,
                 toDoDescription,
-                startDate,
-                endDate,
+                startDate.toISOString().split("T")[0],
+                // endDate.toISOString().split("T")[0],
                 startTime,
-                endTime
+                endTime,
+                new Date().toISOString().split("T")[0],
+                color
               );
               setToDoTitle("");
               setToDoDescription("");
               setStartDate(new Date());
-              setEndDate(new Date());
+              // setEndDate(new Date());
+              setStartTime(new Date(Date.now()));
+              setEndTime(new Date(Date.now()));
+              setColor(["rgba(255, 169, 50, 1)", "#Fff0d4"]);
               props.toggleBottomNavigationView();
             }}
           />
@@ -208,5 +300,77 @@ const styles = StyleSheet.create({
     marginLeft: 15,
     marginRight: 15,
     marginTop: 3,
+  },
+  creamPressed: {
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+    backgroundColor: "#Fff0d4",
+    marginLeft: 15,
+    marginRight: 10,
+    borderWidth: 1.5,
+    borderColor: "rgba(255, 169, 50, 1)",
+  },
+  creamUnpressed: {
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+    backgroundColor: "#Fff0d4",
+    marginLeft: 15,
+    marginRight: 10,
+  },
+  greenPressed: {
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+    backgroundColor: "#baffc1",
+    marginLeft: 15,
+    marginRight: 10,
+    borderWidth: 1.5,
+    borderColor: "#3ed64e",
+  },
+  greenUnpressed: {
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+    backgroundColor: "#baffc1",
+    marginLeft: 15,
+    marginRight: 10,
+  },
+  tealPressed: {
+    height: 25,
+    width: 24,
+    borderRadius: 12,
+    backgroundColor: "#9cc8ff",
+    marginLeft: 15,
+    marginRight: 10,
+    borderWidth: 1.5,
+    borderColor: "#3981db",
+  },
+  tealUnpressed: {
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+    backgroundColor: "#9cc8ff",
+    marginLeft: 15,
+    marginRight: 10,
+  },
+  purplePressed: {
+    height: 25,
+    width: 24,
+    borderRadius: 12,
+    backgroundColor: "#e8c9ff",
+    marginLeft: 15,
+    marginRight: 10,
+    borderWidth: 1.5,
+    borderColor: "#c478ff",
+  },
+  purpleUnpressed: {
+    height: 24,
+    width: 24,
+    borderRadius: 12,
+    backgroundColor: "#e8c9ff",
+    marginLeft: 15,
+    marginRight: 10,
   },
 });

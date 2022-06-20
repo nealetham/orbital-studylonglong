@@ -11,12 +11,12 @@ export default function WeeklySummary() {
 
 const styles = StyleSheet.create({
   container: {
-    height: 130,
-    borderRadius: 15,
-    marginLeft: 15,
-    marginRight: 15,
+    height: 180,
+    borderRadius: 5,
+    // marginLeft: 15,
+    // marginRight: 15,
     marginTop: 10,
-    marginBottom: 20,
+    // marginBottom: 20,
     backgroundColor: "#FFFFFF",
     elevation: 1.5,
     justifyContent: "center",

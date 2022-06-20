@@ -4,7 +4,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 export default function AddTaskButton(props) {
   return (
-    <View style={{ position: "absolute", bottom: 30, right: 5 }}>
+    <View style={{ position: "absolute", bottom: 40, right: 20 }}>
       <TouchableOpacity
         onPress={props.onPress}
         style={{
