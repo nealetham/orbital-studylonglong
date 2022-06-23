@@ -1,20 +1,11 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  KeyboardAvoidingView,
-  Button,
-} from "react-native";
+import { Text, View, TextInput } from "react-native";
 import InlineTextButton from "../components/InlineTextButton";
 import {
   createUserWithEmailAndPassword,
-  getAuth,
   sendEmailVerification,
 } from "firebase/auth";
-import { initializeApp } from "firebase/app";
 import { auth } from "../firebase/index";
 import { globalStyles } from "../styles/global";
 import ActionButton from "../components/ActionButton";
@@ -64,6 +55,7 @@ export default function SignUp({ navigation }) {
         onChangeText={(value) =>
           validateAndSet(value, confirmPassword, setPassword)
         }
+        secureTextEntry={true}
         style={globalStyles.textInputContainer}
       ></TextInput>
       <TextInput
@@ -72,6 +64,7 @@ export default function SignUp({ navigation }) {
         onChangeText={(value) =>
           validateAndSet(value, password, setConfirmPassword)
         }
+        secureTextEntry={true}
         style={globalStyles.textInputContainer}
       ></TextInput>
       <Text style={globalStyles.bodyText}>

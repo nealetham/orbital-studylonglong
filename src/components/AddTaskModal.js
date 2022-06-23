@@ -7,7 +7,6 @@ import {
   Text,
   StyleSheet,
   Pressable,
-  StatusBar,
 } from "react-native";
 import OutIconTextInput from "./OutIconTextInput";
 import ActionButton from "./ActionButton";
@@ -94,11 +93,6 @@ export default function AddTaskModal(props) {
       onBackButtonPress={props.toggleBottomNavigationView}
       onBackdropPress={props.toggleBottomNavigationView}
     >
-      {/* <StatusBar
-        backgroundColor="#4d4d4d"
-        showHideTransition="none"
-        animated={true}
-      /> */}
       <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
         <KeyboardAvoidingView
           style={globalStyles.addTaskBottomSheet}
@@ -252,6 +246,7 @@ export default function AddTaskModal(props) {
             onPress={() => {
               setStartDate(new Date());
               // setEndDate(new Date());
+              setToDoTitle("");
               setStartTime(new Date(Date.now()));
               setEndTime(new Date(Date.now()));
               props.toggleBottomNavigationView();
@@ -277,7 +272,6 @@ export default function AddTaskModal(props) {
               // setEndDate(new Date());
               setStartTime(new Date(Date.now()));
               setEndTime(new Date(Date.now()));
-              setColor(["rgba(255, 169, 50, 1)", "#Fff0d4"]);
               props.toggleBottomNavigationView();
             }}
           />

@@ -1,5 +1,5 @@
 import React from "react";
-import { Text, View, StyleSheet, FlatList } from "react-native";
+import { View, StyleSheet, FlatList } from "react-native";
 import { auth, db } from "../firebase/index";
 import { CalendarList } from "react-native-calendars";
 import {
@@ -74,9 +74,6 @@ export default function Schedule() {
 
       if (itemData.startDate === lastStartDate) {
         const previousMarkedDate = markedDates[itemData.startDate];
-        // const newMarkedDateDots = previousMarkedDate["dots"].push({
-        //   color: itemData.color[0],
-        // });
         const previousDotsArray = previousMarkedDate["dots"];
         const updatedDotsArray = [
           ...previousDotsArray,
