@@ -1,6 +1,6 @@
 import "react-native-gesture-handler";
 import * as React from "react";
-import { View, Text, LogBox } from "react-native";
+import { View, Text } from "react-native";
 import { auth } from "../firebase/index";
 import { sendEmailVerification, signOut } from "firebase/auth";
 import { createDrawerNavigator } from "@react-navigation/drawer";

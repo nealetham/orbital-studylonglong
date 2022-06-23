@@ -3,11 +3,7 @@ import React from "react";
 import { Text, View, TextInput } from "react-native";
 import InlineTextButton from "../components/InlineTextButton";
 import ActionButton from "../components/ActionButton";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-} from "firebase/auth";
+import { signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase/index";
 import { globalStyles } from "../styles/global";
 
@@ -23,7 +19,6 @@ export default function Login({ navigation }) {
       });
     }
   });
-  //{ user: userCredential.user }
   const [errorMessage, setErrorMessage] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -33,7 +28,6 @@ export default function Login({ navigation }) {
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           navigation.navigate("Dashboard");
-          console.log(userCredential.user);
         })
         .catch((error) => {
           setErrorMessage(error.message);

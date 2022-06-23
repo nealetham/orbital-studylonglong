@@ -3,7 +3,6 @@ import React from "react";
 import { ProgressChart } from "react-native-chart-kit";
 
 export default function WeeklySummary(props) {
-  // const rebase = props.completionRate;
   const data = {
     data: [props.completionRate],
   };
@@ -72,8 +71,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     backgroundColor: "#FFFFFF",
     elevation: 1.5,
-    // justifyContent: "center",
-    // alignItems: "center",
     flexDirection: "row",
   },
 });

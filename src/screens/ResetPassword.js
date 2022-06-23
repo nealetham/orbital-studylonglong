@@ -1,16 +1,9 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import {
-  StyleSheet,
-  Text,
-  View,
-  TextInput,
-  KeyboardAvoidingView,
-  Button,
-} from "react-native";
+import { Text, View, TextInput } from "react-native";
 import InlineTextButton from "../components/InlineTextButton";
 import { auth } from "../firebase/index";
-import { getAuth, sendPasswordResetEmail } from "firebase/auth";
+import { sendPasswordResetEmail } from "firebase/auth";
 import { globalStyles } from "../styles/global";
 import ActionButton from "../components/ActionButton";
 
