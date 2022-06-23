@@ -12,6 +12,7 @@ import {
   doc,
 } from "firebase/firestore";
 import ToDoItem from "../components/ToDoItem";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 export default function Schedule() {
   const [toDoLoading, setToDoLoading] = React.useState(true);

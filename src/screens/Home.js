@@ -23,6 +23,10 @@ export default function Home({ navigation }) {
   const [toDoLoading, setToDoLoading] = React.useState(true);
   const [toDos, setToDos] = React.useState([]);
   const [isRefreshing, setIsRefreshing] = React.useState(false);
+  const [totalWeeklyTasks, setTotalWeeklyTasks] = React.useState(0);
+  const [totalCompletedWeeklyTasks, setTotalCompletedWeeklyTasks] =
+    React.useState(0);
+  const [completionRate, setCompletionRate] = React.useState(0);
 
   const toggleBottomNavigationView = () => {
     setVisible(!visible);
@@ -50,9 +54,49 @@ export default function Home({ navigation }) {
     setIsRefreshing(false);
   };
 
+  let loadWeeklySummary = async () => {
+    function startOfWeek() {
+      const d = new Date();
+      let day = d.getDay();
+      const diff = d.getDate() - day + (day == 0 ? -6 : 1);
+      return new Date(d.setDate(diff)).toISOString().split("T")[0];
+    }
+
+    function endOfWeek() {
+      const date = new Date();
+      const today = date.getDate();
+      const dayOfTheWeek = date.getDay();
+      const newDate = date.setDate(today - dayOfTheWeek + 7);
+      return new Date(newDate).toISOString().split("T")[0];
+    }
+
+    const q = query(
+      collection(db, "todos"),
+      where("userId", "==", auth.currentUser.uid),
+      where("startDate", ">=", startOfWeek()),
+      where("startDate", "<=", endOfWeek())
+    );
+
+    const querySnapshot = await getDocs(q);
+    var totalCompleted = 0;
+    var total = 0;
+    querySnapshot.forEach((doc) => {
+      let task = doc.data();
+      if (task.completed) {
+        totalCompleted = totalCompleted + 1;
+        total = total + 1;
+      } else {
+        total++;
+      }
+    });
+    setTotalCompletedWeeklyTasks(totalCompleted);
+    setTotalWeeklyTasks(total);
+    setCompletionRate(totalCompleted / total);
+  };
   React.useEffect(() => {
     if (toDoLoading) {
       loadToDoList(new Date().toISOString().split("T")[0]);
+      loadWeeklySummary();
     }
   });
 
@@ -85,6 +129,7 @@ export default function Home({ navigation }) {
       setToDos(updatedToDos);
     }
     loadToDoList(createdDate);
+    loadWeeklySummary();
   };
 
   let checkOffToDo = async (toDoId) => {
@@ -93,12 +138,15 @@ export default function Home({ navigation }) {
       completed: true,
     });
     loadToDoList(new Date().toISOString().split("T")[0]);
+    loadWeeklySummary();
   };
 
   let deleteToDo = async (toDoId) => {
     await deleteDoc(doc(db, "todos", toDoId));
     let updatedToDos = [...toDos].filter((item) => item.id != toDoId);
     setToDos(updatedToDos);
+    loadToDoList(new Date().toISOString().split("T")[0]);
+    loadWeeklySummary();
   };
 
   return (
@@ -109,7 +157,11 @@ export default function Home({ navigation }) {
         </Text>
 
         {/* Showcases a condensed weekly summary */}
-        <WeeklySummary />
+        <WeeklySummary
+          totalTasks={totalWeeklyTasks}
+          totalCompletedTasks={totalCompletedWeeklyTasks}
+          completionRate={completionRate}
+        />
       </View>
 
       {/* Showcases all tasks added by the user. Implemented

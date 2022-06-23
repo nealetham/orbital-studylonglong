@@ -23,7 +23,7 @@ export default function Login({ navigation }) {
       });
     }
   });
-
+  //{ user: userCredential.user }
   const [errorMessage, setErrorMessage] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -32,7 +32,8 @@ export default function Login({ navigation }) {
     if (email !== "" && password !== "") {
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
-          navigation.navigate("Dashboard", { user: userCredential.user });
+          navigation.navigate("Dashboard");
+          console.log(userCredential.user);
         })
         .catch((error) => {
           setErrorMessage(error.message);
