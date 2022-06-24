@@ -208,6 +208,7 @@ export default function AddTaskModal(props) {
               is24Hour={true}
               display="default"
               onChange={onChangeStartDate}
+              accentColor="orange"
             />
           )}
           {/* {showEndDate && (

@@ -1,12 +1,15 @@
 import { View, Text, StyleSheet } from "react-native";
 import React from "react";
-import { ProgressChart } from "react-native-chart-kit";
+import CircularProgress from "react-native-circular-progress-indicator";
 
 export default function WeeklySummary(props) {
   const data = {
     data: [props.completionRate],
   };
 
+  {
+    /* Dynamic text display based on completion rate of weekly tasks. */
+  }
   const completionText = () => {
     if (props.completionRate <= 0.4) {
       return <Text>You still have quite a bit of tasks to complete!</Text>;
@@ -21,24 +24,20 @@ export default function WeeklySummary(props) {
 
   return (
     <View style={styles.container}>
-      <View style={{ margin: 15 }}>
-        <ProgressChart
-          data={data}
-          width={150}
-          height={150}
-          radius={60}
-          strokeWidth={15}
-          chartConfig={{
-            backgroundGradientFrom: "#FFFFFF",
-            backgroundGradientFromOpacity: 0,
-            backgroundGradientTo: "#FFFFFF",
-            color: (opacity = 1) => `rgba(255, 169, 50, ${opacity})`,
-          }}
-          hideLegend={true}
+      <View style={{ margin: 15, justifyContent: "center" }}>
+        <CircularProgress
+          value={Math.trunc(props.completionRate * 100)}
+          radius={70}
+          duration={1000}
+          // textColor="#222"
+          // fontSize={20}
+          valueSuffix={"%"}
+          activeStrokeColor={"rgba(255, 169, 50, 0.6)"}
+          activeStrokeWidth={12}
+          inActiveStrokeColor={"rgba(255, 169, 50, 1)"}
+          inActiveStrokeOpacity={0.2}
+          inActiveStrokeWidth={12}
         />
-        <Text style={{ top: -90, left: 56, fontSize: 24, fontWeight: "600" }}>
-          {Math.trunc(props.completionRate * 100)}%
-        </Text>
       </View>
       <View
         style={{
@@ -46,17 +45,17 @@ export default function WeeklySummary(props) {
           justifyContent: "center",
         }}
       >
+        <Text style={styles.summaryHeader}>Weekly Summary</Text>
         <Text
           style={{
             width: 170,
             marginBottom: 20,
-            fontSize: 18,
-            fontWeight: "400",
+            fontSize: 15,
           }}
         >
           {completionText()}
         </Text>
-        <Text style={{ width: 170 }}>
+        <Text style={{ width: 170, fontSize: 15 }}>
           {props.totalCompletedTasks}/{props.totalTasks} tasks are completed.
         </Text>
       </View>
@@ -72,5 +71,16 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFFFFF",
     elevation: 1.5,
     flexDirection: "row",
+  },
+  percentage: {
+    top: -95,
+    left: 52,
+    fontSize: 30,
+    fontWeight: "600",
+  },
+  summaryHeader: {
+    fontSize: 20,
+    marginBottom: 15,
+    fontWeight: "600",
   },
 });

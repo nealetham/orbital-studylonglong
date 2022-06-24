@@ -8,7 +8,6 @@ import {
   TouchableWithoutFeedback,
 } from "react-native";
 import React from "react";
-import { globalStyles } from "../styles/global";
 import { Swipeable } from "react-native-gesture-handler";
 import { Ionicons } from "@expo/vector-icons";
 
@@ -18,6 +17,9 @@ export default function ToDoItem(props) {
     setIsModalVisible(bool);
   };
 
+  {
+    /* Underlay of task items upon checking off a task (left to right swipe) */
+  }
   const LeftActions = () => {
     return (
       <View style={styles.leftAction}>
@@ -28,6 +30,9 @@ export default function ToDoItem(props) {
     );
   };
 
+  {
+    /* Underlay of task items upon deleting a task (right to left swipe) */
+  }
   const RightActions = () => {
     return (
       <View style={styles.rightAction}>
@@ -41,6 +46,9 @@ export default function ToDoItem(props) {
   const bdrColor = props.taskColor[0];
   const bgColor = props.taskColor[1];
 
+  {
+    /* Formatting time display */
+  }
   const startTime = new Date(props.taskStartTime.seconds * 1000);
   const fStartTime =
     String(startTime.getHours()).padStart(2, "0") +
@@ -53,22 +61,36 @@ export default function ToDoItem(props) {
     ":" +
     String(endTime.getMinutes()).padStart(2, "0");
 
+  {
+    /* Reference point of this Swipeable component. */
+  }
+  const swipeRef = React.useRef();
+
+  {
+    /* Function to close this referenced Swipeable component.*/
+  }
+  const closeSwipeable = () => {
+    swipeRef.current.close();
+  };
+
   return (
     <Swipeable
       renderLeftActions={LeftActions}
       onSwipeableLeftOpen={() => {
-        props.onSwipeFromLeft();
+        props.onSwipeFromLeft(); // Task is checked off, and re-sorted in the Flatlist component.
+        closeSwipeable(); // Task automatically closes upon checking off.
       }}
+      ref={swipeRef}
       renderRightActions={RightActions}
-      onSwipeableRightOpen={props.onSwipeFromRight}
-      containerStyle={{ overflow: "visible" }} // container clips without this property
+      onSwipeableRightOpen={props.onSwipeFromRight} // Task is deleted from Firebase. List is re-rendered.
+      containerStyle={{ overflow: "visible" }} // Container clips without this property.
     >
       <Pressable
         style={styles.taskContainer}
         onPress={() => changeModalVisible(true)}
       >
         <View
-          style={circleStyle(bdrColor, bgColor, props.taskCompletion)}
+          style={circleStyle(bdrColor, bgColor, props.taskCompletion)} // Dynamic styling based upon chosen color.
         ></View>
         <Text style={taskText(props.taskCompletion)} numberOfLines={1}>
           {props.taskTitle}
@@ -78,6 +100,7 @@ export default function ToDoItem(props) {
         </Text>
       </Pressable>
 
+      {/* Modal view of all task details entered upon creation. */}
       <Modal
         transparent={true}
         animationType="fade"
@@ -161,8 +184,6 @@ function taskText(completed) {
       fontSize: 16,
       width: 200,
       color: "rgba(140, 140, 140, 0.4)",
-      // textDecorationLine: "line-through",
-      // textDecorationStyle: "solid",
     },
     uncompleted: {
       fontSize: 16,
