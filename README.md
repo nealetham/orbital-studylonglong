@@ -7,9 +7,9 @@ STUDYLONGLONG is a one-stop productivity mobile application that aims to meets y
 [Video Demo]()
 
 
-<!-- <p align="center">
-  <img src="/public/poster.png" />
-</p> -->
+<p align="center">
+  <img src="/assets/poster.png" />
+</p>
 
 
 ## Tech Stack
