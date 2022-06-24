@@ -12,6 +12,7 @@ import {
   deleteDoc,
   orderBy,
   updateDoc,
+  onSnapshot,
 } from "firebase/firestore";
 import AddTaskModal from "../components/AddTaskModal";
 import ToDoItem from "../components/ToDoItem";
@@ -32,6 +33,10 @@ export default function Home({ navigation }) {
     setVisible(!visible);
   };
 
+  {
+    /* Loads the tasks for the day. Utilises a listener to check
+      for updates. */
+  }
   let loadToDoList = async (todayDate) => {
     const q = query(
       collection(db, "todos"),
@@ -39,21 +44,26 @@ export default function Home({ navigation }) {
       orderBy("completed"),
       orderBy("startTime")
     );
-    const querySnapshot = await getDocs(q);
-    let toDos = [];
-    querySnapshot.forEach((doc) => {
-      let toDo = doc.data();
-      toDo.id = doc.id;
-      if (todayDate === toDo.startDate) {
-        toDos.push(toDo);
-      }
-    });
 
-    setToDos(toDos);
-    setToDoLoading(false);
-    setIsRefreshing(false);
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      let toDos = [];
+      querySnapshot.forEach((doc) => {
+        let toDo = doc.data();
+        toDo.id = doc.id;
+        if (todayDate === toDo.startDate) {
+          toDos.push(toDo);
+        }
+      });
+      setToDos(toDos);
+      setToDoLoading(false);
+      setIsRefreshing(false);
+    });
   };
 
+  {
+    /* Loads the weekly summary. Does not use a listener. Is called
+      after tasks are added, checked or deleted. */
+  }
   let loadWeeklySummary = async () => {
     function startOfWeek() {
       const d = new Date();
@@ -93,6 +103,10 @@ export default function Home({ navigation }) {
     setTotalWeeklyTasks(total);
     setCompletionRate(totalCompleted / total);
   };
+
+  {
+    /* Initial loading of the todo list and weekly summary. */
+  }
   React.useEffect(() => {
     if (toDoLoading) {
       loadToDoList(new Date().toISOString().split("T")[0]);
@@ -100,6 +114,9 @@ export default function Home({ navigation }) {
     }
   });
 
+  {
+    /* Adds a document with the following fields into Firebase. */
+  }
   let addToDo = async (
     toDoTitle,
     toDoDescription,
@@ -122,30 +139,26 @@ export default function Home({ navigation }) {
       userId: auth.currentUser.uid,
     };
     const docRef = await addDoc(collection(db, "todos"), toDoItem);
-    toDoItem.id = docRef.id;
-    let updatedToDos = [...toDos];
-    if (createdDate === toDoItem.startDate) {
-      updatedToDos.push(toDoItem);
-      setToDos(updatedToDos);
-    }
     loadToDoList(createdDate);
     loadWeeklySummary();
   };
 
+  {
+    /* Checks off the task as completed. Swipeable action, from left to right. */
+  }
   let checkOffToDo = async (toDoId) => {
     const docRef = doc(db, "todos", toDoId);
     await updateDoc(docRef, {
       completed: true,
     });
-    loadToDoList(new Date().toISOString().split("T")[0]);
     loadWeeklySummary();
   };
 
+  {
+    /* Deletes a task. Swipeable action, from right to left. */
+  }
   let deleteToDo = async (toDoId) => {
     await deleteDoc(doc(db, "todos", toDoId));
-    let updatedToDos = [...toDos].filter((item) => item.id != toDoId);
-    setToDos(updatedToDos);
-    loadToDoList(new Date().toISOString().split("T")[0]);
     loadWeeklySummary();
   };
 
@@ -185,6 +198,7 @@ export default function Home({ navigation }) {
             loadToDoList(new Date().toISOString().split("T")[0]);
             setIsRefreshing(true);
           }}
+          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <ToDoItem
               taskTitle={item.title}

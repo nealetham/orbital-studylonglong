@@ -1,5 +1,6 @@
 import React from "react";
 import { Text, View } from "react-native";
+import { ProgressChart } from "react-native-chart-kit";
 
 export default function Summary() {
   return (

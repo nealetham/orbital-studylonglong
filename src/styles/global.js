@@ -8,7 +8,7 @@ export const globalStyles = StyleSheet.create({
   },
   subHeaderText: {
     marginBottom: 5,
-    fontSize: 22,
+    fontSize: 20,
     fontWeight: "400",
   },
   bodyText: {
