@@ -11,6 +11,19 @@ STUDYLONGLONG is a one-stop productivity mobile application that aims to meets y
   <img src="/assets/poster.png" />
 </p>
 
+## Installation
+
+1. Clone the repository.
+2. Install dependencies.
+3. Run the server.
+4. Scan the QR code with your device.
+
+```
+git clone https://github.com/nealetham/orbital-test.git
+npm install
+expo start
+```
+
 
 ## Tech Stack
 
