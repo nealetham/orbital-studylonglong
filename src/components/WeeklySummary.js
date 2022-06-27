@@ -3,12 +3,6 @@ import React from "react";
 import CircularProgress from "react-native-circular-progress-indicator";
 
 export default function WeeklySummary(props) {
-  const data = {
-    data: [props.completionRate],
-  };
-
-  console.log(props.completionRate);
-
   {
     /* Dynamic text display based on completion rate of weekly tasks. */
   }
@@ -36,12 +30,13 @@ export default function WeeklySummary(props) {
     <View style={styles.container}>
       <View style={{ margin: 15, justifyContent: "center" }}>
         <CircularProgress
-          // value={Math.trunc(props.completionRate * 100)}
-          value={isNaN(props.completionRate) ? 100 : props.completionRate}
+          value={
+            isNaN(props.completionRate)
+              ? 100
+              : Math.trunc(props.completionRate * 100)
+          }
           radius={70}
           duration={1000}
-          // textColor="#222"
-          // fontSize={20}
           valueSuffix={"%"}
           activeStrokeColor={"rgba(255, 169, 50, 0.6)"}
           activeStrokeWidth={12}
