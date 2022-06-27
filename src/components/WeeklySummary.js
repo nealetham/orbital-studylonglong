@@ -7,6 +7,8 @@ export default function WeeklySummary(props) {
     data: [props.completionRate],
   };
 
+  console.log(props.completionRate);
+
   {
     /* Dynamic text display based on completion rate of weekly tasks. */
   }
@@ -22,11 +24,20 @@ export default function WeeklySummary(props) {
     }
   };
 
+  function isDefined(rate) {
+    if (typeof rate === "NaN") {
+      return 100;
+    } else {
+      return Math.trunc(rate * 100);
+    }
+  }
+
   return (
     <View style={styles.container}>
       <View style={{ margin: 15, justifyContent: "center" }}>
         <CircularProgress
-          value={Math.trunc(props.completionRate * 100)}
+          // value={Math.trunc(props.completionRate * 100)}
+          value={isNaN(props.completionRate) ? 100 : props.completionRate}
           radius={70}
           duration={1000}
           // textColor="#222"
