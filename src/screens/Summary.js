@@ -90,7 +90,9 @@ export default function Summary() {
     return (
       <View style={{ flexDirection: "row" }}>
         <View style={styles[color]}></View>
-        <Text style={styles.percentageText}>{Math.round(percentage)}%</Text>
+        <Text style={styles.percentageText}>
+          {isNaN(Math.round(percentage)) ? 100 : Math.round(percentage)}%
+        </Text>
       </View>
     );
   };
