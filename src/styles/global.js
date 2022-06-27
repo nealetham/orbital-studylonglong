@@ -135,4 +135,78 @@ export const globalStyles = StyleSheet.create({
     height: 400,
     paddingTop: 30,
   },
+  addTimerModal: {
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    width: "100%",
+    height: 320,
+    paddingTop: 30,
+  },
+  timePickerStyle: {
+    paddingLeft: 30,
+    paddingRight: 30,
+  },
+  timerContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    height: 300,
+  },
+  singleTimerList: {
+    padding: 20,
+    paddingTop: 40,
+    width: "100%",
+    height: 200,
+    alignItems: "flex-start",
+  },
+  singleTimerText: {
+    marginBottom: 10,
+    fontSize: 18,
+    fontWeight: "400",
+  },
+  singleTimerTime: {
+    fontSize: 30,
+    fontWeight: "200",
+  },
+  singleListItem: {
+    alignItems: 'center',
+    padding: 10,
+    width: 120,
+  },
+  singleTimerButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 20,
+    paddingHorizontal: 5,
+    borderRadius: 12,
+    elevation: 5,
+    backgroundColor: '#EEE',
+  },
+  dumplingList: {
+    alignItems: 'center',
+    backgroundColor: "#fff",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    width: "100%",
+    height: 250,
+    paddingTop: 30,
+  },
+  dumplingListText: {
+    fontSize: 15,
+    fontWeight: "400",
+  },
+  dumplingText: {
+    fontSize: 18,
+    fontWeight: "400", 
+  },
+  dumplingButton: {
+    height: 130,
+  },
+  dumplingItem: {
+    alignItems: 'center',
+  },
+  pic: {
+    width: 160,
+    height: 160,
+  },
 });
