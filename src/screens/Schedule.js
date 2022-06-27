@@ -137,12 +137,14 @@ export default function Schedule() {
           {selectedDate.split("-")[0]}
         </Text>
         <FlatList
+          style={{ height: 250 }}
           data={toDos}
           refreshing={isRefreshing}
           onRefresh={() => {
             loadSelectedDate(selectedDate);
             setIsRefreshing(true);
           }}
+          showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <ToDoItem
               taskTitle={item.title}
