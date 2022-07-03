@@ -47,6 +47,7 @@ export default function Schedule() {
     const q = query(
       collection(db, "todos"),
       where("userId", "==", auth.currentUser.uid),
+      where("startDate", "==", selectedDate),
       orderBy("completed"),
       orderBy("startTime")
     );
@@ -110,6 +111,7 @@ export default function Schedule() {
       renderMarkedDates();
     }
   });
+
   return (
     <View>
       <CalendarList
