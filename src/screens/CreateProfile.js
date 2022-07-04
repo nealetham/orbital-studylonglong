@@ -1,6 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import React from "react";
-import { Text, View, TextInput, Alert } from "react-native";
+import { Text, View, TextInput, Alert, LogBox } from "react-native";
 import { updateProfile } from "firebase/auth";
 import { auth } from "../firebase/index";
 import { globalStyles } from "../styles/global";
@@ -33,6 +33,10 @@ export default function CreateProfile({ navigation, userCreds }) {
       Alert.alert("Missing required fields", "Please input your name.");
     }
   };
+
+  LogBox.ignoreLogs([
+    "Non-serializable values were found in the navigation state",
+  ]);
 
   return (
     <View style={globalStyles.container}>

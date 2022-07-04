@@ -23,6 +23,9 @@ export default function Timer() {
   const [timerRunning, setTimer] = React.useState(false);
   const [timerTime, setTimerTime] = React.useState(0);
   const [countDownId, setCountDownId] = React.useState(undefined);
+  const [longImage, setLongImage] = React.useState(
+    require("../../assets/long-default-pau.png")
+  );
 
   React.useEffect(() => {
     const id = new Date().getTime().toString();
@@ -86,11 +89,30 @@ export default function Timer() {
     setSingleTimerList([...singleTimerList, singleTimer]);
   };
 
+  const Bao = require("../../assets/long-default-pau.png");
+  const Ebi = require("../../assets/ebi-long.png");
+  const Gyoza = require("../../assets/gyoza-long.png");
+  const Coconut = require("../../assets/coconut-long.png");
+
+  function getImage(name) {
+    if (name === "Bao") {
+      return Bao;
+    } else if (name === "Ebi") {
+      return Ebi;
+    } else if (name === "Gyoza") {
+      return Gyoza;
+    } else {
+      return Coconut;
+    }
+  }
+
   {
     /* Set Dumpling Model to the one chosen */
   }
   let setDumplingChoice = (dumpling) => {
-    alert("'" + dumpling.title + "'" + "picked!");
+    // alert("'" + dumpling.title + "'" + "picked!");
+    setLongImage(getImage(dumpling.title));
+    // console.log(dumpling.path);
   };
 
   return (
@@ -107,10 +129,7 @@ export default function Timer() {
         </Text>
 
         <TouchableHighlight onPress={toggleDumplingSelectionView}>
-          <Image
-            style={globalStyles.pic}
-            source={require("../../assets/long-default-pau.png")}
-          />
+          <Image style={globalStyles.pic} source={longImage} />
         </TouchableHighlight>
 
         <Text style={globalStyles.subHeaderText}>
