@@ -41,16 +41,6 @@ export const globalStyles = StyleSheet.create({
     borderColor: "#e8e8e8",
     borderWidth: 0.4,
   },
-  // taskCircle: {
-  //   height: 22,
-  //   width: 22,
-  //   borderRadius: 11,
-  //   backgroundColor: "#Fff0d4",
-  //   borderColor: "rgba(255, 169, 50, 1)",
-  //   borderWidth: 2,
-  //   marginLeft: 15,
-  //   marginRight: 15,
-  // },
   taskText: {
     fontSize: 16,
     width: 200,
@@ -182,17 +172,16 @@ export const globalStyles = StyleSheet.create({
     elevation: 5,
     backgroundColor: "#EEE",
   },
-  dumplingList: {
-    alignItems: "center",
+  dumplingModal: {
     backgroundColor: "#fff",
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     width: "100%",
     height: 250,
-    paddingTop: 30,
+    paddingTop: 25,
   },
-  dumplingListText: {
-    fontSize: 15,
+  dumplingModalText: {
+    fontSize: 18,
     fontWeight: "400",
   },
   dumplingText: {
@@ -203,7 +192,12 @@ export const globalStyles = StyleSheet.create({
     height: 130,
   },
   dumplingItem: {
+    height: 100,
+    width: 100,
     alignItems: "center",
+    resizeMode: "contain",
+    marginLeft: 10,
+    marginRight: 10,
   },
   pic: {
     width: 160,

@@ -6,7 +6,8 @@ import {
   createUserWithEmailAndPassword,
   sendEmailVerification,
 } from "firebase/auth";
-import { auth } from "../firebase/index";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../firebase/index";
 import { globalStyles } from "../styles/global";
 import ActionButton from "../components/ActionButton";
 
@@ -32,6 +33,22 @@ export default function SignUp({ navigation }) {
         .then((userCredential) => {
           sendEmailVerification(auth.currentUser);
           navigation.navigate("CreateProfile", { user: userCredential.user });
+        })
+        .then(() => {
+          const charCollection = {
+            coins: 50,
+            // char1: true,
+            // char2: false,
+            // char3: false,
+            // char4: false,
+            available: ["Bao"],
+            unavailable: ["Ebi", "Gyoza", "Coconut"],
+            userId: auth.currentUser.uid,
+          };
+          const docRef = setDoc(
+            doc(db, "coins", auth.currentUser.uid),
+            charCollection
+          );
         })
         .catch((error) => {
           setValidationMessage(error.message);
