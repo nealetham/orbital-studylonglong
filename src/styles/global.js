@@ -130,7 +130,7 @@ export const globalStyles = StyleSheet.create({
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,
     width: "100%",
-    height: 320,
+    height: 200,
     paddingTop: 30,
   },
   timePickerStyle: {

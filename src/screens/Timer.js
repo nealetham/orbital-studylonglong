@@ -13,16 +13,22 @@ import AddTimerModal from "../components/AddTimerModal";
 import DumplingSelection from "../components/ChooseDumplingModal";
 import CountDown from "react-native-countdown-component";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { doc, getDoc, updateDoc, setDoc } from "firebase/firestore";
+import { auth, db } from "../firebase/index";
 
 export default function Timer() {
   const [visibleDumplingSelection, setVisibleDumplingSelection] =
     React.useState(false);
   const [visibleAddTimer, setVisibleAddTimer] = React.useState(false);
   const [singleTimerList, setSingleTimerList] = React.useState([]);
-  const [isRefreshing, setIsRefreshing] = React.useState(false);
   const [timerRunning, setTimer] = React.useState(false);
   const [timerTime, setTimerTime] = React.useState(0);
   const [countDownId, setCountDownId] = React.useState(undefined);
+  const [elapsedTime, setElapsedTime] = React.useState(0);
+  const Bao = require("../../assets/long-default-pau.png");
+  const Ebi = require("../../assets/ebi-long.png");
+  const Gyoza = require("../../assets/gyoza-long.png");
+  const Coconut = require("../../assets/coconut-long.png");
   const [longImage, setLongImage] = React.useState(
     require("../../assets/long-default-pau.png")
   );
@@ -48,12 +54,8 @@ export default function Timer() {
     setTimer(!timerRunning);
   };
 
-  {
-    /* Remove item from Single Timer List */
-  }
-  let removeItem = (title) => {
-    const filteredData = singleTimerList.filter((item) => item.title !== title);
-    setSingleTimerList([...filteredData]);
+  const pausePlayTimer = () => {
+    setTimer(!timerRunning);
   };
 
   {
@@ -65,7 +67,6 @@ export default function Timer() {
       setCountDownId(id);
     }
     setTimerTime(minutes * 60 + seconds);
-    toggleTimer();
   };
 
   {
@@ -74,25 +75,28 @@ export default function Timer() {
   let timerFinish = () => {
     alert("Session Over!");
     toggleTimer();
+    // store timer time in firestore here
   };
 
   {
     /* Add Single Timer to Single Timer List */
   }
-  let addToSingleTimerList = async (title, task, minutes, seconds) => {
-    const singleTimer = {
-      title: title,
-      task: task,
-      minutes: minutes,
-      seconds: seconds,
-    };
-    setSingleTimerList([...singleTimerList, singleTimer]);
-  };
+  // let addToSingleTimerList = async (title, task, minutes, seconds) => {
+  //   const singleTimer = {
+  //     title: title,
+  //     task: task,
+  //     minutes: minutes,
+  //     seconds: seconds,
+  //   };
+  //   setSingleTimerList([...singleTimerList, singleTimer]);
+  // };
 
-  const Bao = require("../../assets/long-default-pau.png");
-  const Ebi = require("../../assets/ebi-long.png");
-  const Gyoza = require("../../assets/gyoza-long.png");
-  const Coconut = require("../../assets/coconut-long.png");
+  /* Remove item from Single Timer List */
+  // }
+  // let removeItem = (title) => {
+  //   const filteredData = singleTimerList.filter((item) => item.title !== title);
+  //   setSingleTimerList([...filteredData]);
+  // };
 
   function getImage(name) {
     if (name === "Bao") {
@@ -110,10 +114,106 @@ export default function Timer() {
     /* Set Dumpling Model to the one chosen */
   }
   let setDumplingChoice = (dumpling) => {
-    // alert("'" + dumpling.title + "'" + "picked!");
     setLongImage(getImage(dumpling.title));
-    // console.log(dumpling.path);
   };
+
+  const mediaRunning = () => {
+    return (
+      <View style={{ flexDirection: "row" }}>
+        <Pressable
+          onPress={() => {
+            toggleTimer();
+            recordFinishedSession(elapsedTime + 1);
+          }}
+          disabled={timerTime == 0}
+        >
+          <Icon
+            size={60}
+            name="stop-circle-outline"
+            style={{ paddingRight: 30 }}
+          />
+        </Pressable>
+
+        <Pressable onPress={pausePlayTimer} disabled={timerTime == 0}>
+          <Icon size={60} name="play-pause" style={{ paddingLeft: 30 }} />
+        </Pressable>
+      </View>
+    );
+  };
+
+  const mediaNotRunning = () => {
+    return (
+      <Pressable onPress={toggleTimer} disabled={timerTime == 0}>
+        <Icon size={60} name="play-circle-outline" />
+      </Pressable>
+    );
+  };
+
+  const createMonthRecord = async (bool) => {
+    const currMonth = new Date().getMonth();
+    const monthArray = (month, year) => {
+      const numOfDays = new Date(year, month, 0).getDate();
+      return new Array(numOfDays);
+    };
+
+    const arr = monthArray(currMonth, new Date().getFullYear());
+    arr.fill(0, 0, arr.length);
+
+    if (bool) {
+      await setDoc(doc(db, "sessions", auth.currentUser.uid + currMonth), {
+        userId: auth.currentUser.uid,
+        month: currMonth,
+        totalNumberOfSessions: 0,
+        totalDuration: 0,
+        longestSession: 0,
+        data: arr,
+      });
+    } else {
+    }
+  };
+
+  const recordFinishedSession = async (duration) => {
+    const currDate = new Date().getDate();
+    const currMonth = new Date().getMonth();
+    const docRef = doc(db, "sessions", auth.currentUser.uid + currMonth);
+
+    const checkLongestSessions = (lastLongestSession) => {
+      if (lastLongestSession < duration) {
+        return duration;
+      } else {
+        return lastLongestSession;
+      }
+    };
+
+    const updateData = (previousData) => {
+      previousData[currDate - 1] = previousData[currDate - 1] + duration;
+      return previousData;
+    };
+
+    const foo = await getDoc(docRef);
+    const sessionData = foo.data();
+
+    const docSnap = await updateDoc(docRef, {
+      totalNumberOfSessions: sessionData.totalNumberOfSessions + 1,
+      totalDuration: sessionData.totalDuration + duration,
+      longestSession: checkLongestSessions(sessionData.longestSession),
+      data: updateData(sessionData.data),
+    });
+  };
+
+  React.useEffect(() => {
+    const currMonth = new Date().getMonth();
+
+    const checkRecord = async () => {
+      const docRef = doc(db, "sessions", auth.currentUser.uid + currMonth);
+      const docSnap = await getDoc(docRef);
+      if (!docSnap.exists() || new Date().getDate() === 1) {
+        createMonthRecord(true);
+      } else {
+      }
+    };
+    checkRecord();
+  });
 
   return (
     <View
@@ -141,7 +241,10 @@ export default function Timer() {
           id={countDownId}
           size={35}
           until={timerTime}
-          onFinish={timerFinish}
+          onFinish={() => {
+            timerFinish();
+            recordFinishedSession(timerTime);
+          }}
           digitStyle={{ backgroundColor: "#FFF" }}
           digitTxtStyle={{ color: "#000" }}
           timeLabelStyle={{ color: "red", fontWeight: "bold" }}
@@ -150,14 +253,14 @@ export default function Timer() {
           timeLabels={{ m: null, s: null }}
           running={timerRunning}
           showSeparator
+          onPress={() => {
+            toggleAddTimerView();
+          }}
+          onChange={(until) => {
+            setElapsedTime(until);
+          }} // keeps track of duration passed
         />
-
-        <Pressable onPress={toggleTimer} disabled={timerTime == 0}>
-          <Icon
-            size={60}
-            name={timerRunning ? "stop-circle-outline" : "play-circle-outline"}
-          />
-        </Pressable>
+        <View>{timerRunning ? mediaRunning() : mediaNotRunning()}</View>
       </View>
 
       {!timerRunning && (
@@ -195,14 +298,14 @@ export default function Timer() {
 
       {/* AddTaskButton at botton right of
                 the screen to bring up the AddTimerModal. */}
-      {!timerRunning && <AddTaskButton onPress={toggleAddTimerView} />}
+      {/* {!timerRunning && <AddTaskButton onPress={toggleAddTimerView} />} */}
 
       {/* Modal brought up by the AddTaskButton. Allows users
                 to add single timers to their single timer list */}
       <AddTimerModal
         visible={visibleAddTimer}
         toggleBottomNavigationView={toggleAddTimerView}
-        onPress={addToSingleTimerList}
+        onPress={setTime}
       />
 
       {/* Modal to perform dumpling selection. Allows users

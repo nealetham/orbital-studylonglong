@@ -3,19 +3,7 @@ import * as React from "react";
 import { View, Text } from "react-native";
 import { auth, db } from "../firebase/index";
 import { sendEmailVerification, signOut } from "firebase/auth";
-import {
-  collection,
-  addDoc,
-  query,
-  where,
-  getDocs,
-  doc,
-  deleteDoc,
-  orderBy,
-  updateDoc,
-  onSnapshot,
-  setDoc,
-} from "firebase/firestore";
+import { doc, onSnapshot } from "firebase/firestore";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import Schedule from "./Schedule";
 import Home from "./Home";

@@ -1,22 +1,44 @@
 import React from "react";
-import { Text, View, StyleSheet } from "react-native";
-import { ProgressChart } from "react-native-chart-kit";
-import { collection, query, where, onSnapshot } from "firebase/firestore";
+import { Text, View, StyleSheet, Dimensions } from "react-native";
+import { LineChart } from "react-native-chart-kit";
+import { onSnapshot, doc, setDoc, getDoc } from "firebase/firestore";
 import { auth, db } from "../firebase/index";
-import { CircularProgressBase } from "react-native-circular-progress-indicator";
+// import { CircularProgressBase } from "react-native-circular-progress-indicator";
+import { Rect, Text as TextSVG, Svg } from "react-native-svg";
 
 export default function Summary() {
   const [isLoading, setIsLoading] = React.useState(true);
-  const [creamRatio, setCreamRatio] = React.useState({});
-  const [greenRatio, setGreenRatio] = React.useState({});
-  const [blueRatio, setBlueRatio] = React.useState({});
-  const [purpleRatio, setPurpleRatio] = React.useState({});
+  const [sessionData, setSessionData] = React.useState([
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0,
+  ]);
+  const [totalDuration, setTotalDuration] = React.useState(0);
+  const [numOfSessions, setNumOfSessions] = React.useState(0);
+  const [longestSession, setLongestSession] = React.useState(0);
+  const [mostProductive, setMostProductive] = React.useState();
+  // [ 20, 45, 28, 80, 130, 43, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+  const dimWidth = Dimensions.get("window").width;
+  const month = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
 
-  const props = {
-    activeStrokeWidth: 25,
-    inActiveStrokeWidth: 20,
-    inActiveStrokeOpacity: 0.2,
-  };
+  const [tooltipPos, setTooltipPos] = React.useState({
+    x: 0,
+    y: 0,
+    visible: false,
+    value: 0,
+  });
 
   const startOfMonth = () => {
     const date = new Date();
@@ -24,180 +46,265 @@ export default function Summary() {
     return new Date(date).toISOString().split("T")[0];
   };
 
-  let loadMonthlySummary = async () => {
-    const q = query(
-      collection(db, "todos"),
-      where("userId", "==", auth.currentUser.uid),
-      where("startDate", ">=", startOfMonth())
-    );
+  const createMonthRecord = async (bool) => {
+    const currMonth = new Date().getMonth();
+    const monthArray = (month, year) => {
+      const numOfDays = new Date(year, month, 0).getDate();
+      return new Array(numOfDays);
+    };
 
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      let cream = { completed: 0, total: 0 };
-      let green = { completed: 0, total: 0 };
-      let blue = { completed: 0, total: 0 };
-      let purple = { completed: 0, total: 0 };
-      querySnapshot.forEach((doc) => {
-        let task = doc.data();
-        task.id = doc.id;
-        if (task.color[0] === "rgba(255, 169, 50, 1)") {
-          // orange color
-          if (task.completed === true) {
-            cream["completed"] = cream["completed"] + 1;
-            cream["total"] = cream["total"] + 1;
-          } else {
-            cream["total"] = cream["total"] + 1;
-          }
-        } else if (task.color[0] === "#3ed64e") {
-          // green color
-          if (task.completed === true) {
-            green["completed"] = green["completed"] + 1;
-            green["total"] = green["total"] + 1;
-          } else {
-            green["total"] = green["total"] + 1;
-          }
-        } else if (task.color[0] === "#3981db") {
-          // blue color
-          if (task.completed === true) {
-            blue["completed"] = blue["completed"] + 1;
-            blue["total"] = blue["total"] + 1;
-          } else {
-            blue["total"] = blue["total"] + 1;
-          }
-        } else {
-          if (task.completed === true) {
-            purple["completed"] = purple["completed"] + 1;
-            purple["total"] = purple["total"] + 1;
-          } else {
-            purple["total"] = purple["total"] + 1;
-          }
-        }
+    const arr = monthArray(currMonth, new Date().getFullYear());
+    arr.fill(0, 0, arr.length);
+
+    if (bool) {
+      await setDoc(doc(db, "sessions", auth.currentUser.uid + currMonth), {
+        userId: auth.currentUser.uid,
+        month: currMonth,
+        totalNumberOfSessions: 0,
+        totalDuration: 0,
+        longestSession: 0,
+        data: arr,
       });
-      setCreamRatio(cream);
-      setGreenRatio(green);
-      setBlueRatio(blue);
-      setPurpleRatio(purple);
-    });
+    } else {
+    }
   };
-
   React.useEffect(() => {
+    const currMonth = new Date().getMonth();
+
+    const checkRecord = async () => {
+      const docRef = doc(db, "sessions", auth.currentUser.uid + currMonth);
+      const docSnap = await getDoc(docRef);
+      if (!docSnap.exists() || new Date().getDate() === 1) {
+        createMonthRecord(true);
+      } else {
+      }
+    };
+    checkRecord();
+
     if (isLoading) {
-      loadMonthlySummary();
+      loadSummary();
       setIsLoading(false);
     }
   });
 
-  const legend = (color, percentage) => {
-    return (
-      <View style={{ flexDirection: "row" }}>
-        <View style={styles[color]}></View>
-        <Text style={styles.percentageText}>
-          {isNaN(Math.round(percentage)) ? 100 : Math.round(percentage)}%
-        </Text>
-      </View>
+  const loadSummary = async () => {
+    const currMonth = new Date().getMonth();
+    const unsub = onSnapshot(
+      doc(db, "sessions", auth.currentUser.uid + currMonth),
+      (doc) => {
+        setSessionData(doc.data().data);
+        setTotalDuration(doc.data().totalDuration);
+        setNumOfSessions(doc.data().totalNumberOfSessions);
+        setLongestSession(doc.data().longestSession);
+      }
     );
   };
+
+  const findProductiveDay = (arrayOfDurations) => {
+    const clone = [...arrayOfDurations];
+
+    const checkIfSame = (arr) => {
+      arr.sort();
+      if (arr[0] === arr[arr.length - 1]) {
+        return true;
+      }
+      return false;
+    };
+
+    const findMax = (elem) => {
+      let temp = 0;
+      arrayOfDurations.forEach((element) => {
+        if (temp < element) {
+          temp = element;
+        }
+      });
+      return elem === temp;
+    };
+
+    if (checkIfSame(clone)) {
+      return "You're equally productive everyday.";
+    } else {
+      return (
+        arrayOfDurations.findIndex(findMax) +
+        1 +
+        " " +
+        month[new Date().getMonth()]
+      );
+    }
+  };
+
+  const data = {
+    labels: [
+      "1",
+      "5",
+      "   10",
+      "        15",
+      "           20",
+      "               25",
+      "                  30",
+    ],
+    datasets: [
+      {
+        data: sessionData,
+        // color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`, // optional changes outline color of line
+        strokeWidth: 2, // optional
+      },
+    ],
+  };
+
+  const hideDataPoints = () => {
+    const dataPoint = Array.from(Array(30), (e, i) => i + 1);
+    const cutOffDate = new Date().getDate() - 1;
+    return dataPoint.slice(cutOffDate);
+  };
+
+  function DataCard(props) {
+    return (
+      <View
+        style={{
+          width: dimWidth * 0.45,
+          backgroundColor: "#FFF",
+          // elevation: 1,
+          height: 90,
+          marginTop: 20,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text style={{ fontSize: 14, fontWeight: "500" }}>{props.header}</Text>
+        <Text style={{ marginTop: 15, fontSize: 14 }}>{props.data}</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1 }}>
       <View
         style={{
-          flex: 1,
-          margin: 15,
-          elevation: 1.5,
+          flex: 0.7,
+          elevation: 5,
           backgroundColor: "#FFFFFF",
-          justifyContent: "center",
-          flexDirection: "row",
+          alignItems: "center",
+          paddingTop: 20,
+        }}
+      >
+        <Text style={{ paddingBottom: 15, fontSize: 18 }}>
+          Productivity in {month[new Date().getMonth()]}
+        </Text>
+        <LineChart
+          data={data}
+          width={dimWidth}
+          height={220}
+          yAxisInterval={5}
+          fromZero
+          chartConfig={{
+            backgroundColor: "#ffffff",
+            backgroundGradientFrom: "#ffffff",
+            backgroundGradientTo: "#ffffff",
+            color: (opacity = 1) => `rgba(255, 169, 50, 1)`,
+            propsForBackgroundLines: {
+              strokeOpacity: 0.2,
+              stroke: "gray",
+            },
+            propsForHorizontalLabels: {
+              fontSize: 14,
+            },
+            propsForVerticalLabels: {
+              fontSize: 14,
+            },
+            decimalPlaces: 0,
+            propsForDots: {
+              r: "3.5",
+            },
+          }}
+          style={{ marginLeft: -40 }}
+          bezier
+          decorator={() => {
+            return tooltipPos.visible ? (
+              <View>
+                <Svg>
+                  {/* <Rect
+                    x={tooltipPos.x}
+                    y={tooltipPos.y - 15}
+                    width="40"
+                    height="30"
+                    fill="rgba(230, 230, 230, 0)"
+                  /> */}
+                  <TextSVG
+                    x={tooltipPos.x}
+                    y={tooltipPos.y - 5}
+                    fill="rgba(0, 0, 0, 0.5)"
+                    fontSize="15"
+                    fontWeight="bold"
+                    textAnchor="middle"
+                  >
+                    {tooltipPos.value + "s"}
+                  </TextSVG>
+                </Svg>
+              </View>
+            ) : null;
+          }}
+          onDataPointClick={(data) => {
+            let isSamePoint =
+              tooltipPos.x === data.x && tooltipPos.y === data.y;
+
+            isSamePoint
+              ? setTooltipPos((previousState) => {
+                  return {
+                    ...previousState,
+                    value: data.value,
+                    visible: !previousState.visible,
+                  };
+                })
+              : setTooltipPos({
+                  x: data.x,
+                  value: data.value,
+                  y: data.y,
+                  visible: true,
+                });
+          }}
+          hidePointsAtIndex={hideDataPoints()}
+        />
+      </View>
+      <View
+        style={{
+          // marginTop: 10,
+          flex: 1,
+          justifyContent: "flex-start",
+          backgroundColor: "rgba(248, 248, 248, 0.5)",
         }}
       >
         <View
           style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            marginLeft: 25,
+            flexDirection: "row",
+            justifyContent: "space-evenly",
           }}
         >
-          <CircularProgressBase
-            {...props}
-            value={(creamRatio["completed"] / creamRatio["total"]) * 100}
-            radius={95}
-            activeStrokeColor={"rgba(255, 169, 50, 0.6)"}
-            inActiveStrokeColor={"rgba(255, 169, 50, 1)"}
-            inActiveStrokeOpacity={0.2}
-            activeStrokeWidth={20}
-            inActiveStrokeWidth={16}
-          >
-            <CircularProgressBase
-              {...props}
-              value={(greenRatio["completed"] / greenRatio["total"]) * 100}
-              radius={70}
-              activeStrokeColor={"#3ed64e"}
-              inActiveStrokeColor={"#3ed64e"}
-              inActiveStrokeOpacity={0.2}
-              activeStrokeWidth={20}
-              inActiveStrokeWidth={16}
-            >
-              <CircularProgressBase
-                {...props}
-                value={(blueRatio["completed"] / blueRatio["total"]) * 100}
-                radius={45}
-                activeStrokeColor={"#3981db"}
-                inActiveStrokeColor={"#3981db"}
-                activeStrokeWidth={20}
-                inActiveStrokeWidth={16}
-              >
-                <CircularProgressBase
-                  {...props}
-                  value={
-                    (purpleRatio["completed"] / purpleRatio["total"]) * 100
-                  }
-                  radius={20}
-                  activeStrokeColor={"#c478ff"}
-                  inActiveStrokeColor={"#c478ff"}
-                  activeStrokeWidth={20}
-                  inActiveStrokeWidth={16}
-                />
-              </CircularProgressBase>
-            </CircularProgressBase>
-          </CircularProgressBase>
+          <DataCard
+            header="Total Duration"
+            data={Math.floor(totalDuration / 60) + " Minutes"}
+          />
+          <DataCard header="Total Number of Sessions" data={numOfSessions} />
         </View>
-        <View
-          style={{
-            flex: 1,
-            flexDirection: "column",
-            justifyContent: "center",
-          }}
-        >
-          <Text
-            style={{
-              marginBottom: 15,
-              fontWeight: "600",
-              fontSize: 15,
-              marginLeft: 15,
-              marginRight: 15,
-            }}
-          >
-            Monthly Completion
-          </Text>
-          {legend(
-            "creamPressed",
-            (creamRatio["completed"] / creamRatio["total"]) * 100
-          )}
-          {legend(
-            "greenPressed",
-            (greenRatio["completed"] / greenRatio["total"]) * 100
-          )}
-          {legend(
-            "tealPressed",
-            (blueRatio["completed"] / blueRatio["total"]) * 100
-          )}
-          {legend(
-            "purplePressed",
-            (purpleRatio["completed"] / purpleRatio["total"]) * 100
-          )}
+        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+          <DataCard
+            header="Longest Session"
+            data={Math.floor(longestSession / 60) + " Minutes"}
+          />
+          <DataCard
+            header="Most Productive Day"
+            data={findProductiveDay(sessionData)}
+          />
         </View>
+        {/* <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+          <DataCard header="Most Sessions in a Day" data="30" />
+          <DataCard header="Most Productive Day" data="4 July 2022" />
+        </View>
+        <View style={{ flexDirection: "row", justifyContent: "space-evenly" }}>
+          <DataCard header="Longest Session" data="53 minutes" />
+          <DataCard header="Shortest Session" data="13 minutes" />
+        </View> */}
       </View>
-      <View style={{ flex: 1.6 }}></View>
     </View>
   );
 }
@@ -208,7 +315,6 @@ const styles = StyleSheet.create({
     width: 16,
     backgroundColor: "#Fff0d4",
     marginLeft: 40,
-    // marginRight: 20,
     borderWidth: 1.5,
     borderColor: "rgba(255, 169, 50, 1)",
     marginBottom: 20,
@@ -218,7 +324,6 @@ const styles = StyleSheet.create({
     width: 16,
     backgroundColor: "#baffc1",
     marginLeft: 40,
-    // marginRight: 10,
     borderWidth: 1.5,
     borderColor: "#3ed64e",
     marginBottom: 20,
@@ -228,7 +333,6 @@ const styles = StyleSheet.create({
     width: 16,
     backgroundColor: "#9cc8ff",
     marginLeft: 40,
-    // marginRight: 10,
     borderWidth: 1.5,
     borderColor: "#3981db",
     marginBottom: 20,
@@ -238,8 +342,6 @@ const styles = StyleSheet.create({
     width: 16,
     backgroundColor: "#e8c9ff",
     marginLeft: 40,
-    // marginRight: 10,
-    // marginLeft: -5,
     borderWidth: 1.5,
     borderColor: "#c478ff",
     marginBotom: 20,
