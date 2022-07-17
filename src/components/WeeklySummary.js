@@ -32,7 +32,7 @@ export default function WeeklySummary(props) {
         <CircularProgress
           value={
             isNaN(props.completionRate)
-              ? 100
+              ? 0
               : Math.trunc(props.completionRate * 100)
           }
           radius={70}

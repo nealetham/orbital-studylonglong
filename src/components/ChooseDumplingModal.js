@@ -53,7 +53,6 @@ export default function DumplingSelection(props) {
     let charList = [];
     let inventoryData = coinsData.available;
     for (let i = 0; i < inventoryData.length; i++) {
-      // const asset = "../../assets/" + inventoryData[i] + ".png";
       const item = {
         title: inventoryData[i],
         path: getImage(inventoryData[i]),

@@ -175,7 +175,10 @@ export default function Shop() {
       </View>
       <View style={styles.inline}>
         <Text style={styles.subHeading}>Open for 100 coins?</Text>
-        <TouchableOpacity onPress={() => checkSufficientCoins()}>
+        <TouchableOpacity
+          onPress={() => checkSufficientCoins()}
+          style={{ width: 40, height: 40 }}
+        >
           <Icon name="checkcircleo" size={40} color="#000" />
         </TouchableOpacity>
 
@@ -238,6 +241,7 @@ const styles = StyleSheet.create({
     padding: 50,
     marginLeft: 20,
     marginTop: 120,
+    height: 500,
     flex: 3,
     flexDirection: "row",
     justifyContent: "space-evenly",
