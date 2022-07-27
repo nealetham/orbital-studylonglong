@@ -36,11 +36,7 @@ export default function SignUp({ navigation }) {
         })
         .then(() => {
           const charCollection = {
-            coins: 50,
-            // char1: true,
-            // char2: false,
-            // char3: false,
-            // char4: false,
+            coins: 200,
             available: ["Bao"],
             unavailable: ["Ebi", "Gyoza", "Coconut"],
             userId: auth.currentUser.uid,

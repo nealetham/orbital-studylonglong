@@ -16,7 +16,6 @@ export default function Summary() {
   const [numOfSessions, setNumOfSessions] = React.useState(0);
   const [longestSession, setLongestSession] = React.useState(0);
   const [mostProductive, setMostProductive] = React.useState();
-  // [ 20, 45, 28, 80, 130, 43, 20, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
   const dimWidth = Dimensions.get("window").width;
   const month = [
     "January",
